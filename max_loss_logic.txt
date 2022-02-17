@@ -1,0 +1,51 @@
+example:
+
+500 / 6000 = quantity_purchased
+quantity_purchased * 5000 = balance
+500 - balance = loss
+
+500 / current_price = quantity_purchased
+quantity_purchased * lowest_price = 400 (dollar_investment - max_loss)
+lowest_price = 400 / quantity_purchased
+
+- need to display total gain/loss in GUI
+- refresh every couple seconds or minute?
+- kill program every night at midnight for now?
+
+pseudo:
+
+total_loss = None
+total_gain = None
+max_loss = <user_input>
+lowest_balance_allowed = dollar_investment - max_loss
+lowest_price_allowed = lowest_balance_allowed / quantity_purchased
+
+dollar_investment / current_price() = quantity_purchased
+quantity_purchased * current_price() = new_dollar_balance
+
+
+
+if dollar_investment > new_dollar_balance
+	# loss
+	loss = dollar_investment - new_dollar_balance
+	total_loss += loss
+
+	if total_gain - loss >= 0
+		total_gain -= loss
+	else
+		total_gain = 0
+
+	if total_loss >= max_loss
+		sys.exit()
+
+
+if dollar_investment < new_dollar_balance
+	#gain
+	gain = new_dollar_balance - dollar_investment
+	total_gain += gain
+
+	if total_loss - gain >= 0
+		total_loss -= gain
+	else
+		total_loss = 0
+

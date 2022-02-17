@@ -1,0 +1,8 @@
+adding timestamp to terminal output:
+https://askubuntu.com/questions/193416/adding-timestamps-to-terminal-prompts
+
+
+
+
+crossover price:3700
+limit buy price:3750
