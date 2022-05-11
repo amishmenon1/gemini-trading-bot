@@ -23,8 +23,8 @@ import logging
 
 with open('gem.txt', "r") as text_file:
     text_string = text_file.readlines()
-    public_key = text_string[0].split(':')[1].rstrip() # public key with heartbeat
-    api_secret = text_string[1].split(':')[1].rstrip() # API secret with heartbeat
+    public_key = text_string[2].split(':')[1].rstrip() # public key with heartbeat
+    api_secret = text_string[3].split(':')[1].rstrip() # API secret with heartbeat
 
 run_thread = None
 marketdata_websocket_thread = None
@@ -415,12 +415,12 @@ def run_in_new_thread():
 
             time.sleep(3)
 
-            try:
-                tracker.send_heartbeat()
-                print('{}: Heartbeat sent'.format(datetime.now()))
-            except:
-                print('{}: HEARTBEAT FAILED'.format(datetime.now()))
-                pass
+            # try:
+            #     tracker.send_heartbeat()
+            #     print('{}: Heartbeat sent'.format(datetime.now()))
+            # except:
+            #     print('{}: HEARTBEAT FAILED'.format(datetime.now()))
+            #     pass
 
 
 def run():
