@@ -65,7 +65,7 @@ stop_limit_order = None
 buy_side = "buy"
 sell_side = "sell"
 options = ["maker-or-cancel"]
-token_symbol = "ethusd"
+token_symbol = "ustusd"
 latest_order_id = None
 order_id_iterator = 0
 total_loss = 0
@@ -126,7 +126,7 @@ def populate_user_values():
     # user_sell_price5 = convert_to_float(interface.target_sell_price5_entry.get())
     user_stop_limit_price = convert_to_float(interface.target_stop_limit_price_entry.get())
     user_speak_input = interface.speak_label_entry.get()
-    speak = True if user_speak_input is 'y' else False
+    speak = True if user_speak_input == 'y' else False
 
     # TODO for dollar cost averaging
     one_sell_price = user_sell_price1 > 0 and user_sell_price2 == 0 and user_sell_price3 == 0 and user_sell_price4 == 0 and user_sell_price5 == 0
