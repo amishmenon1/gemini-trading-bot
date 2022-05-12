@@ -337,7 +337,8 @@ def run_in_new_thread():
             stop_order_prefix = 'stop-limit-'
             # purchase_quantity = '%.8f' % (user_initial_dollar_balance / user_buy_price) #btc
             # purchase_quantity = '%.6f' % (user_initial_dollar_balance / user_buy_price)  #eth
-            purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  #ftm
+            # purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  #ftm
+            purchase_quantity = '%.3f' % (user_initial_dollar_balance / user_buy_price)  #ust
             # user_sell_price1 could be the threshold price?
 
             if should_buy():
