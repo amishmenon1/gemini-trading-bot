@@ -167,11 +167,12 @@ def create_stop_limit(order_id, quantity):
     global stop_limit_order
     global user_stop_limit_price
     global speak
+    buffer = 0.05 if token_symbol == "ustusd" else 50
 
-    stop_price = user_stop_limit_price + 50
+    stop_price = user_stop_limit_price + buffer
     if stop_price >= float(get_token_price()):
-        stop_price = float(get_token_price()) - 100
-        user_stop_limit_price = stop_price - 50
+        stop_price = float(get_token_price()) - (buffer * 2)
+        user_stop_limit_price = stop_price - buffer
     stop_limit_order = Order(
         client.new_limit_order(order_id, token_symbol, quantity, user_stop_limit_price, sell_side, stop_price))
     stop_limit_made = True
@@ -319,11 +320,11 @@ def run_in_new_thread():
 
     populate_user_values()
 
-    if user_stop_limit_price == 0:
-        print('Missing stop limit price.')
-        should_run = False
-    else:
-        should_run = True
+    # if user_stop_limit_price == 0:
+    #     print('Missing stop limit price.')
+    #     should_run = False
+    # else:
+    should_run = True
 
     while True and should_run is True:
         lock = threading.Lock()
@@ -347,16 +348,15 @@ def run_in_new_thread():
                 time.sleep(5)
 
             if order_filled(buy_order):
-
-                if stop_limit_made is False:
-                    print('Buy Order 1 has been filled.')
-                    # this is a Mac/Linux feature only
-                    if speak:
-                        os.system('say "Buy order has been filled. Making stop limit now."')
-
-                    stop_limit_id = stop_order_prefix + str(order_id_iterator)
-                    stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
-                    time.sleep(2)
+                print('Buy Order 1 has been filled.')
+                # this is a Mac/Linux feature only
+                if speak:
+                    os.system('say "Buy order has been filled. Making stop limit now."')
+                # if stop_limit_made is False: # and get_token_price() <= user_stop_limit_price:
+                #     stop_limit_id = stop_order_prefix + str(order_id_iterator)
+                #     print('purchase qty: {}'.format(purchase_quantity))
+                #     stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
+                #     time.sleep(2)
 
                 if sell_order_placed() is False:
                     print('Making sell order...')
