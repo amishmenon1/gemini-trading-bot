@@ -65,7 +65,7 @@ stop_limit_order = None
 buy_side = "buy"
 sell_side = "sell"
 options = ["maker-or-cancel"]
-token_symbol = "ustusd"
+token_symbol = "ftmusd"
 latest_order_id = None
 order_id_iterator = 0
 total_loss = 0
@@ -167,12 +167,12 @@ def create_stop_limit(order_id, quantity):
     global stop_limit_order
     global user_stop_limit_price
     global speak
-    buffer = 0.05 if token_symbol == "ustusd" else 50
+    buffer = 0.05 #if token_symbol == "ustusd" else 50
 
-    stop_price = user_stop_limit_price + buffer
+    stop_price = user_stop_limit_price
     if stop_price >= float(get_token_price()):
-        stop_price = float(get_token_price()) - (buffer * 2)
-        user_stop_limit_price = stop_price - buffer
+        stop_price = float(get_token_price()) - buffer
+        # user_stop_limit_price = stop_price
     stop_limit_order = Order(
         client.new_limit_order(order_id, token_symbol, quantity, user_stop_limit_price, sell_side, stop_price))
     stop_limit_made = True
@@ -320,11 +320,11 @@ def run_in_new_thread():
 
     populate_user_values()
 
-    # if user_stop_limit_price == 0:
-    #     print('Missing stop limit price.')
-    #     should_run = False
-    # else:
-    should_run = True
+    if user_stop_limit_price == 0:
+        print('Missing stop limit price.')
+        should_run = False
+    else:
+        should_run = True
 
     while True and should_run is True:
         lock = threading.Lock()
@@ -338,8 +338,8 @@ def run_in_new_thread():
             stop_order_prefix = 'stop-limit-'
             # purchase_quantity = '%.8f' % (user_initial_dollar_balance / user_buy_price) #btc
             # purchase_quantity = '%.6f' % (user_initial_dollar_balance / user_buy_price)  #eth
-            # purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  #ftm
-            purchase_quantity = '%.3f' % (user_initial_dollar_balance / user_buy_price)  #ust
+            purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  #ftm
+            # purchase_quantity = '%.3f' % (user_initial_dollar_balance / user_buy_price)  #ust
             # user_sell_price1 could be the threshold price?
 
             if should_buy():
@@ -352,11 +352,11 @@ def run_in_new_thread():
                 # this is a Mac/Linux feature only
                 if speak:
                     os.system('say "Buy order has been filled. Making stop limit now."')
-                # if stop_limit_made is False: # and get_token_price() <= user_stop_limit_price:
-                #     stop_limit_id = stop_order_prefix + str(order_id_iterator)
-                #     print('purchase qty: {}'.format(purchase_quantity))
-                #     stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
-                #     time.sleep(2)
+                if stop_limit_made is False: # and get_token_price() <= user_stop_limit_price:
+                    stop_limit_id = stop_order_prefix + str(order_id_iterator)
+                    print('purchase qty: {}'.format(purchase_quantity))
+                    stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
+                    time.sleep(2)
 
                 if sell_order_placed() is False:
                     print('Making sell order...')
