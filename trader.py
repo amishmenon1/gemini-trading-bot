@@ -167,12 +167,12 @@ def create_stop_limit(order_id, quantity):
     global stop_limit_order
     global user_stop_limit_price
     global speak
-    buffer = 0.05 #if token_symbol == "ustusd" else 50
+    buffer = 0.005 #if token_symbol == "ustusd" else 50
 
-    stop_price = user_stop_limit_price
+    stop_price = user_stop_limit_price + buffer
     if stop_price >= float(get_token_price()):
-        stop_price = float(get_token_price()) - buffer
-        # user_stop_limit_price = stop_price
+        stop_price = float("{0:.4f}".format(float(get_token_price()) - (buffer*2)))
+        user_stop_limit_price = stop_price - buffer
     stop_limit_order = Order(
         client.new_limit_order(order_id, token_symbol, quantity, user_stop_limit_price, sell_side, stop_price))
     stop_limit_made = True
@@ -348,7 +348,8 @@ def run_in_new_thread():
                 time.sleep(5)
 
             if order_filled(buy_order):
-                print('Buy Order 1 has been filled.')
+                if sell_order_placed() is False:
+                    print('Buy Order 1 has been filled.')
                 # this is a Mac/Linux feature only
                 if speak:
                     os.system('say "Buy order has been filled. Making stop limit now."')
