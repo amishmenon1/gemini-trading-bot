@@ -272,6 +272,7 @@ class Client(object):
         return self._invoke_api(endpoint, payload, pub=False)
 
     def cancel_session_orders(self):
+        print('cancelling session orders')
         """ https://docs.gemini.com/rest-api/#cancel-all-session-orders """
         endpoint = '/order/cancel/session'
 
@@ -283,6 +284,7 @@ class Client(object):
         return self._invoke_api(endpoint, payload, pub=False)
 
     def cancel_all_orders(self):
+        print('cancelling all orders')
         """ https://docs.gemini.com/rest-api/#cancel-all-active-orders """
         endpoint = '/order/cancel/all'
 
