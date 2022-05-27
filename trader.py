@@ -174,7 +174,7 @@ def create_stop_limit(order_id, quantity):
         stop_price = float("{0:.4f}".format(float(get_token_price()) - (buffer*2)))
         user_stop_limit_price = stop_price - buffer
     stop_limit_order = Order(
-        client.new_limit_order(order_id, token_symbol, quantity, user_stop_limit_price, sell_side, stop_price))
+        client.new_limit_order(order_id, token_symbol, quantity, float("{0:.4f}".format(user_stop_limit_price)), sell_side, float("{0:.4f}".format(stop_price))))
     stop_limit_made = True
     print("Stop limit made.")
     if speak:
@@ -320,11 +320,11 @@ def run_in_new_thread():
 
     populate_user_values()
 
-    if user_stop_limit_price == 0:
-        print('Missing stop limit price.')
-        should_run = False
-    else:
-        should_run = True
+    # if user_stop_limit_price == 0:
+    #     print('Missing stop limit price.')
+    #     should_run = False
+    # else:
+    should_run = True
 
     while True and should_run is True:
         lock = threading.Lock()
@@ -353,11 +353,11 @@ def run_in_new_thread():
                 # this is a Mac/Linux feature only
                 if speak:
                     os.system('say "Buy order has been filled. Making stop limit now."')
-                if stop_limit_made is False: # and get_token_price() <= user_stop_limit_price:
-                    stop_limit_id = stop_order_prefix + str(order_id_iterator)
-                    print('purchase qty: {}'.format(purchase_quantity))
-                    stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
-                    time.sleep(2)
+                # if stop_limit_made is False: # and get_token_price() <= user_stop_limit_price:
+                #     stop_limit_id = stop_order_prefix + str(order_id_iterator)
+                #     print('purchase qty: {}'.format(purchase_quantity))
+                #     stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
+                #     time.sleep(2)
 
                 if sell_order_placed() is False:
                     print('Making sell order...')
