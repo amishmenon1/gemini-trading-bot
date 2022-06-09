@@ -155,8 +155,11 @@ def create_limit_buy_order(buy_order_id, quantity):
 
 def get_token_price():
     global token_symbol
-    price = tracker.get_current_bid_price(token_symbol)
-    # price = websocketclient.get_btc_price()
+    try:
+        price = tracker.get_current_bid_price(token_symbol)
+        # price = websocketclient.get_btc_price()
+    except:
+        pass
     return price
 
 def create_stop_limit(order_id, quantity):
@@ -165,13 +168,14 @@ def create_stop_limit(order_id, quantity):
     global sell_side
     global stop_limit_made
     global stop_limit_order
-    global user_stop_limit_price
+    global user_stop_limit_price #.3395
     global speak
     buffer = 0.005 #if token_symbol == "ustusd" else 50
+    buffer2 = 0.0005
     print('making stop limit order')
-    stop_price = user_stop_limit_price + buffer
+    stop_price = user_stop_limit_price + buffer #.3344
     if stop_price >= float(get_token_price()):
-        stop_price = float("{0:.4f}".format(float(get_token_price()) - (buffer*2)))
+        stop_price = float("{0:.4f}".format(float(get_token_price()) - (buffer2)))
         user_stop_limit_price = stop_price - buffer
     stop_limit_order = Order(
         client.new_limit_order(order_id, token_symbol, quantity, float("{0:.4f}".format(user_stop_limit_price)), sell_side, float("{0:.4f}".format(stop_price))))
