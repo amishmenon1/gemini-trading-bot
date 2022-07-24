@@ -1,5 +1,7 @@
 # Gemini Trading App
 
+# *** This app is under significant refactor and should only be used for educational and testing purposes ***
+
 ## Pre-requisites
 
 1. A Gemini trading account
