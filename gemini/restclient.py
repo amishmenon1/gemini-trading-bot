@@ -30,7 +30,7 @@ class Client(object):
     # Private API methods
     # -------------------
     def _get_nonce(self):
-        return time.time()*1000
+        return time.time()  # *1000
 
     def _handle_response(self, request, response):
         """ Handles all responses from the API. Checks the return HTTP status code and formats the response in JSON. """
@@ -56,13 +56,16 @@ class Client(object):
         b64 = base64.b64encode(payload)
 
         # sign the requests
-        signature = hmac.new(str.encode(self.API_SECRET), b64, hashlib.sha384).hexdigest()
+        signature = hmac.new(str.encode(self.API_SECRET),
+                             b64, hashlib.sha384).hexdigest()
 
         headers = {
             'Content-Type': 'text/plain',
+            'Content-Length': "0",
             'X-GEMINI-APIKEY': self.API_KEY,
             'X-GEMINI-PAYLOAD': b64,
-            'X-GEMINI-SIGNATURE': signature
+            'X-GEMINI-SIGNATURE': signature,
+            'Cache-Control': "no-cache"
         }
 
         url = self.BASE_URI + endpoint
@@ -356,10 +359,10 @@ class Client(object):
     # def get_order_status(self):
     #     """ https://docs.gemini.com/rest-api/#get-notional-volume """
     #     endpoint = '/v1/order/status'
-    #
+
     #     payload = {
     #         'request': self.API_VERSION + endpoint,
     #         'nonce': self._get_nonce(),
     #     }
 
-        return self._invoke_api(endpoint, payload, pub=False)
+    #     return self._invoke_api(endpoint, payload, pub=False)

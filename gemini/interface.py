@@ -1,5 +1,4 @@
 from tkinter.ttk import Label, Entry
-
 import gemini.tracker as tracker
 from tkinter import *
 # import gemini.trader as trader
@@ -22,7 +21,7 @@ target_sell_price5_label_text = 'Sell Price 5: '
 target_stop_limit_price_label_text = 'Stop Limit Price: '
 speak_label_text = '[Mac Only] Sound On? (y/n)'
 
-### old labels
+# old labels
 # budget_entry = None
 # set_aside_amt_entry = None
 # stop_price_entry = None
@@ -30,7 +29,7 @@ speak_label_text = '[Mac Only] Sound On? (y/n)'
 # max_loss_entry = None
 # failsafe_price_entry = None
 
-token_symbol_input_label_entry = None
+token_symbol_input_label_entry = ''
 initial_balance_entry = None
 target_buy_price_entry = None
 target_sell_price1_entry = None
@@ -62,7 +61,8 @@ def render_input_label(window, label, user_entry, row_index, col_index):
     globals()[user_entry] = Entry(window)
     # Mac feature only
     # globals()[user_entry].pack(side=RIGHT)
-    globals()[user_entry].grid(row=row_index, column=col_index + 1, pady=2, padx=8, sticky=W)
+    globals()[user_entry].grid(row=row_index,
+                               column=col_index + 1, pady=2, padx=8, sticky=W)
     # globals()[user_entry].insert(0, row_index)
     globals()[user_entry].config(highlightbackground='black')
 
@@ -80,7 +80,8 @@ def render_btc_price_label(window):
     global token_price_label
     global symbol_label
 
-    price_label_text = 'ETH Price: ${}'.format(str(tracker.get_current_bid_price('ethusd')))
+    price_label_text = 'ETH Price: ${}'.format(
+        str(tracker.get_current_bid_price('ethusd')))
     token_price_label = Label(window, text='ETH Price: ')
     # Mac feature only
     # btc_price_label.pack(fill=X)
@@ -112,7 +113,7 @@ def render_stop_button(row_index, window, command):
 
 
 def draw_gui(run_command, stop_command):
-    ### new labels
+    # new labels
     global target_buy_price_label_text
     global target_sell_price1_label_text
     global target_sell_price2_label_text
@@ -141,8 +142,9 @@ def draw_gui(run_command, stop_command):
     last_row_index = 7
     label_col_index = 0
 
-    ### new labels
-    token_symbol_input_label = Label(window, text=token_symbol_input_label_text)
+    # new labels
+    token_symbol_input_label = Label(
+        window, text=token_symbol_input_label_text)
     initial_balance_label = Label(window, text=initial_balance_label_text)
     limit_buy_label = Label(window, text=target_buy_price_label_text)
     sell_price1_label = Label(window, text=target_sell_price1_label_text)
@@ -153,17 +155,23 @@ def draw_gui(run_command, stop_command):
     stop_limit_label = Label(window, text=target_stop_limit_price_label_text)
     speak_label = Label(window, text=speak_label_text)
 
-    ### new labels
-    render_input_label(window, token_symbol_input_label, 'token_symbol_input_label_entry', token_symbol_row_index, label_col_index)
-    render_input_label(window, initial_balance_label, 'initial_balance_entry', initial_balance_row_index, label_col_index)
-    render_input_label(window, limit_buy_label, 'target_buy_price_entry', limit_buy_row_index, label_col_index)
-    render_input_label(window, sell_price1_label, 'target_sell_price1_entry', sell_price1_row_index, label_col_index)
+    # new labels
+    render_input_label(window, token_symbol_input_label,
+                       'token_symbol_input_label_entry', token_symbol_row_index, label_col_index)
+    render_input_label(window, initial_balance_label, 'initial_balance_entry',
+                       initial_balance_row_index, label_col_index)
+    render_input_label(window, limit_buy_label, 'target_buy_price_entry',
+                       limit_buy_row_index, label_col_index)
+    render_input_label(window, sell_price1_label, 'target_sell_price1_entry',
+                       sell_price1_row_index, label_col_index)
     # render_input_label(window, sell_price2_label, 'target_sell_price2_entry', sell_price2_row_index, label_col_index)
     # render_input_label(window, sell_price3_label, 'target_sell_price3_entry', sell_price3_row_index, label_col_index)
     # render_input_label(window, sell_price4_label, 'target_sell_price4_entry', sell_price4_row_index, label_col_index)
     # render_input_label(window, sell_price5_label, 'target_sell_price5_entry', sell_price5_row_index, label_col_index)
-    render_input_label(window, stop_limit_label, 'target_stop_limit_price_entry', stop_limit_row_index, label_col_index)
-    render_input_label(window, speak_label, 'speak_label_entry', speak_row_index, label_col_index)
+    render_input_label(window, stop_limit_label, 'target_stop_limit_price_entry',
+                       stop_limit_row_index, label_col_index)
+    render_input_label(window, speak_label, 'speak_label_entry',
+                       speak_row_index, label_col_index)
 
     render_run_button(last_row_index, window, run_command)
     render_stop_button(last_row_index, window, stop_command)
@@ -173,7 +181,8 @@ def draw_gui(run_command, stop_command):
 
 def refresh_price(root, symbol):
     global token_price_label
-    price_label_text = 'ETH Price: ${}'.format(str(tracker.get_current_bid_price('ethusd')))
+    price_label_text = 'CHILLGUYUSD Price: ${}'.format(
+        str(tracker.get_current_bid_price('chillguyusd')))
     try:
         token_price_label.configure(text=price_label_text)
         root.after(4500, refresh_price, root, symbol)

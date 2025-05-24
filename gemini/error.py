@@ -14,35 +14,122 @@ class GeminiError(Exception):
     def __str__(self):
         return self.message
 
-class AuctionNotOpen(GeminiError): pass
-class ClientOrderIdTooLong(GeminiError): pass
-class ClientOrderIdMustBeString(GeminiError): pass
-class ConflictingOptions(GeminiError): pass
-class EndpointMismatch(GeminiError): pass
-class EndpointNotFound(GeminiError): pass
-class IneligibleTiming(GeminiError): pass
-class InsufficientFunds(GeminiError): pass
-class InvalidJson(GeminiError): pass
-class InvalidNonce(GeminiError): pass
-class InvalidOrderType(GeminiError): pass
-class InvalidPrice(GeminiError): pass
-class InvalidQuantity(GeminiError): pass
-class InvalidSide(GeminiError): pass
-class InvalidSignature(GeminiError): pass
-class InvalidSymbol(GeminiError): pass
-class Maintenance(GeminiError): pass
-class MarketNotOpen(GeminiError): pass
-class MissingApikeyHeader(GeminiError): pass
-class MissingOrderField(GeminiError): pass
-class MissingRole(GeminiError): pass
-class MissingPayloadHeader(GeminiError): pass
-class MissingSignatureHeader(GeminiError): pass
-class NoSSL(GeminiError): pass
-class OptionsMustBeArray(GeminiError): pass
-class OrderNotFound(GeminiError): pass
-class RateLimit(GeminiError): pass
-class System(GeminiError): pass
-class UnsupportedOption(GeminiError): pass
+
+class AuctionNotOpen(GeminiError):
+    pass
+
+
+class ClientOrderIdTooLong(GeminiError):
+    pass
+
+
+class ClientOrderIdMustBeString(GeminiError):
+    pass
+
+
+class ConflictingOptions(GeminiError):
+    pass
+
+
+class EndpointMismatch(GeminiError):
+    pass
+
+
+class EndpointNotFound(GeminiError):
+    pass
+
+
+class IneligibleTiming(GeminiError):
+    pass
+
+
+class InsufficientFunds(GeminiError):
+    pass
+
+
+class InvalidJson(GeminiError):
+    pass
+
+
+class InvalidNonce(GeminiError):
+    pass
+
+
+class InvalidOrderType(GeminiError):
+    pass
+
+
+class InvalidPrice(GeminiError):
+    pass
+
+
+class InvalidQuantity(GeminiError):
+    pass
+
+
+class InvalidSide(GeminiError):
+    pass
+
+
+class InvalidSignature(GeminiError):
+    pass
+
+
+class InvalidSymbol(GeminiError):
+    pass
+
+
+class Maintenance(GeminiError):
+    pass
+
+
+class MarketNotOpen(GeminiError):
+    pass
+
+
+class MissingApikeyHeader(GeminiError):
+    pass
+
+
+class MissingOrderField(GeminiError):
+    pass
+
+
+class MissingRole(GeminiError):
+    pass
+
+
+class MissingPayloadHeader(GeminiError):
+    pass
+
+
+class MissingSignatureHeader(GeminiError):
+    pass
+
+
+class NoSSL(GeminiError):
+    pass
+
+
+class OptionsMustBeArray(GeminiError):
+    pass
+
+
+class OrderNotFound(GeminiError):
+    pass
+
+
+class RateLimit(GeminiError):
+    pass
+
+
+class System(GeminiError):
+    pass
+
+
+class UnsupportedOption(GeminiError):
+    pass
+
 
 api_error_map = {
     'AuctionNotOpen': AuctionNotOpen,
@@ -75,6 +162,7 @@ api_error_map = {
     'System': System,
     'UnsupportedOption': UnsupportedOption
 }
+
 
 def raise_api_error(request, response):
     print(json.dumps(response.json()))

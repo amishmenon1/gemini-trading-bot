@@ -92,3 +92,5 @@ celerybeat-schedule
 .ropeproject
 
 gem.txt
+logs_file
+scratch.md

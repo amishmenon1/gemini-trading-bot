@@ -4,12 +4,14 @@ from gemini.classes.Order import Order
 from gemini.restclient import Client
 
 
-with open('gem.txt', "r") as text_file:
+with open('../../gem.txt', "r") as text_file:
     text_string = text_file.readlines()
-    public_key = text_string[0].split(':')[1].rstrip() # public key with heartbeat
-    api_secret = text_string[1].split(':')[1].rstrip() # API secret with heartbeat
+    public_key = text_string[0].split(
+        ':')[1].rstrip()  # public key with heartbeat
+    api_secret = text_string[1].split(
+        ':')[1].rstrip()  # API secret with heartbeat
 
-client = Client(public_key, api_secret)
+client = Client(public_key, api_secret, False)
 
 
 def get_current_bid_price(symbol):

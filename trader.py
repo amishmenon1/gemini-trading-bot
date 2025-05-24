@@ -20,11 +20,15 @@ except ImportError:
 import time
 import logging
 
-
-with open('gem.txt', "r") as text_file:
+# seems to be the relative path based on the run location
+# # right now the run loc is `venv/bin``
+with open('../../gem.txt', "r") as text_file:
     text_string = text_file.readlines()
-    public_key = text_string[0].split(':')[1].rstrip() # public key with heartbeat
-    api_secret = text_string[1].split(':')[1].rstrip() # API secret with heartbeat
+    public_key = text_string[0].split(
+        ':')[1].rstrip()  # public key with heartbeat
+    api_secret = text_string[1].split(
+        ':')[1].rstrip()  # API secret with heartbeat
+    print(public_key, api_secret)
 
 run_thread = None
 marketdata_websocket_thread = None
@@ -35,7 +39,9 @@ use_websocket = False
 if use_websocket:
     client = websocketclient.initiate_restclient_connection()
 else:
+    # TO TOGGLE SANDBOX ON SET LAST PARAM TO TRUE
     client = Client(public_key, api_secret, False)
+print(client.BASE_URI)
 purchase_quantity = 0
 start_time = None
 num_seconds = None
@@ -66,6 +72,7 @@ buy_side = "buy"
 sell_side = "sell"
 options = ["maker-or-cancel"]
 token_symbol = "ethusd"
+# token_symbol = "chillguyusd"
 latest_order_id = None
 order_id_iterator = 0
 total_loss = 0
@@ -117,16 +124,19 @@ def populate_user_values():
     global speak
 
     token_symbol = interface.token_symbol_input_label_entry.get()
-    user_initial_dollar_balance = convert_to_float(interface.initial_balance_entry.get())
+    user_initial_dollar_balance = convert_to_float(
+        interface.initial_balance_entry.get())
     user_buy_price = convert_to_float(interface.target_buy_price_entry.get())
-    user_sell_price1 = convert_to_float(interface.target_sell_price1_entry.get())
+    user_sell_price1 = convert_to_float(
+        interface.target_sell_price1_entry.get())
     # user_sell_price2 = convert_to_float(interface.target_sell_price2_entry.get())
     # user_sell_price3 = convert_to_float(interface.target_sell_price3_entry.get())
     # user_sell_price4 = convert_to_float(interface.target_sell_price4_entry.get())
     # user_sell_price5 = convert_to_float(interface.target_sell_price5_entry.get())
-    user_stop_limit_price = convert_to_float(interface.target_stop_limit_price_entry.get())
+    user_stop_limit_price = convert_to_float(
+        interface.target_stop_limit_price_entry.get())
     user_speak_input = interface.speak_label_entry.get()
-    speak = True if user_speak_input is 'y' else False
+    speak = True if user_speak_input == 'y' else False
 
     # TODO for dollar cost averaging
     one_sell_price = user_sell_price1 > 0 and user_sell_price2 == 0 and user_sell_price3 == 0 and user_sell_price4 == 0 and user_sell_price5 == 0
@@ -143,8 +153,10 @@ def create_limit_buy_order(buy_order_id, quantity):
     global user_buy_price
     global buy_side
     global speak
-
-    buy_order = Order(client.new_order(buy_order_id, token_symbol, quantity, user_buy_price, buy_side))
+    print(
+        f"making new order with these params: buy_order_id: {buy_order_id}, token_symbol: {token_symbol}, quantity: {quantity}, user_buy_price: {user_buy_price}, buy_side: {buy_side},")
+    buy_order = Order(client.new_order(
+        buy_order_id, token_symbol, quantity, user_buy_price, buy_side))
     buy_order_made = True
     # print("New buy order made: " + str(buy_order.to_string()))
     logging.info("New buy order made")
@@ -159,19 +171,36 @@ def get_token_price():
     # price = websocketclient.get_btc_price()
     return price
 
+
 def create_stop_limit(order_id, quantity):
     global token_symbol
     global user_buy_price
     global sell_side
     global stop_limit_made
     global stop_limit_order
+    global user_sell_price1
     global user_stop_limit_price
     global speak
 
-    stop_price = user_stop_limit_price + 50
+    # ETHUSD CALCULATIONS
+
+    # stop_price = user_stop_limit_price + 50
+    # if stop_price >= float(get_token_price()):
+    #     stop_price = float(get_token_price()) - 100
+    #     user_stop_limit_price = stop_price - 50
+
+    # CHILLGUYUSD CALCULATIONS
+    # stop_price = user_stop_limit_price + (user_stop_limit_price * 0.0052)
+    # if stop_price >= float(get_token_price()):
+    #     stop_price = float(get_token_price()) - (user_stop_limit_price * 0.01)
+    #     user_stop_limit_price = stop_price - (user_stop_limit_price * 0.0052)
+
+    stop_price = user_stop_limit_price + 0.0005
     if stop_price >= float(get_token_price()):
-        stop_price = float(get_token_price()) - 100
-        user_stop_limit_price = stop_price - 50
+        stop_price = float(get_token_price()) - 0.001
+        user_stop_limit_price = stop_price - 0.0005
+    print(
+        f"(.01) sell price: {user_sell_price1} | (.0052) stop price: {stop_price} | stop limit_price: {user_stop_limit_price}")
     stop_limit_order = Order(
         client.new_limit_order(order_id, token_symbol, quantity, user_stop_limit_price, sell_side, stop_price))
     stop_limit_made = True
@@ -188,7 +217,8 @@ def create_limit_sell_order(sell_order_id, sell_price, quantity):
     global sell_order_made
     global speak
 
-    sell_order = Order(client.new_order(sell_order_id, token_symbol, quantity, sell_price, sell_side))
+    sell_order = Order(client.new_order(
+        sell_order_id, token_symbol, quantity, sell_price, sell_side))
     sell_order_made = True
     print("New limit sell order placed.")
     if speak:
@@ -198,11 +228,15 @@ def create_limit_sell_order(sell_order_id, sell_price, quantity):
 
 
 def order_filled(order, stop_limit_price=None):
+
     filled = False
     if hasattr(order, 'order_id'):
+        print(f" order ID: {order.order_id}")
         order_status = tracker.get_order_status(order.order_id)
+
         if order_status and hasattr(order_status, 'remaining_amount') and order_status.remaining_amount:
-            filled = bool(float(order_status.remaining_amount) == 0)
+            print(f" order remaining amount: {order_status.remaining_amount}")
+            filled = bool(float(order_status.remaining_amount) == float(0))
         # filled = websocketclient.order_filled(order, stop_limit_price)
         return filled
 
@@ -247,23 +281,37 @@ def get_sell_quantity():
     if one_sell_price:
         sell_quantities['sell_quantity'] = purchase_quantity
     elif two_sell_prices:
-        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * purchase_quantity
-        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * purchase_quantity
+        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * \
+            purchase_quantity
     elif three_sell_prices:
-        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * purchase_quantity
-        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * purchase_quantity
-        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * purchase_quantity
+        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * \
+            purchase_quantity
     elif four_sell_prices:
-        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * purchase_quantity
-        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * purchase_quantity
-        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * purchase_quantity
-        sell_quantities['sell_quantity4'] = sell_order_4_coefficient * purchase_quantity
+        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity4'] = sell_order_4_coefficient * \
+            purchase_quantity
     elif five_sell_prices:
-        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * purchase_quantity
-        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * purchase_quantity
-        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * purchase_quantity
-        sell_quantities['sell_quantity4'] = sell_order_4_coefficient * purchase_quantity
-        sell_quantities['sell_quantity5'] = sell_order_5_coefficient * purchase_quantity
+        sell_quantities['sell_quantity1'] = sell_order_1_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity2'] = sell_order_2_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity3'] = sell_order_3_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity4'] = sell_order_4_coefficient * \
+            purchase_quantity
+        sell_quantities['sell_quantity5'] = sell_order_5_coefficient * \
+            purchase_quantity
     else:
         stop()
 
@@ -337,12 +385,15 @@ def run_in_new_thread():
             stop_order_prefix = 'stop-limit-'
             # purchase_quantity = '%.8f' % (user_initial_dollar_balance / user_buy_price) #btc
             # purchase_quantity = '%.6f' % (user_initial_dollar_balance / user_buy_price)  #eth
-            purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  #ftm
+            purchase_quantity = '%.2f' % (
+                user_initial_dollar_balance / user_buy_price)  # chillguy
+            # purchase_quantity = '%.4f' % (user_initial_dollar_balance / user_buy_price)  # ftm
             # user_sell_price1 could be the threshold price?
 
             if should_buy():
                 buy_order_id = buy_order_id_prefix + str(order_id_iterator)
-                buy_order = create_limit_buy_order(buy_order_id, purchase_quantity)
+                buy_order = create_limit_buy_order(
+                    buy_order_id, purchase_quantity)
                 time.sleep(5)
 
             if order_filled(buy_order):
@@ -351,10 +402,12 @@ def run_in_new_thread():
                     print('Buy Order 1 has been filled.')
                     # this is a Mac/Linux feature only
                     if speak:
-                        os.system('say "Buy order has been filled. Making stop limit now."')
+                        os.system(
+                            'say "Buy order has been filled. Making stop limit now."')
 
                     stop_limit_id = stop_order_prefix + str(order_id_iterator)
-                    stop_limit_order = create_stop_limit(stop_limit_id, purchase_quantity)
+                    stop_limit_order = create_stop_limit(
+                        stop_limit_id, purchase_quantity)
                     time.sleep(2)
 
                 if sell_order_placed() is False:
@@ -364,9 +417,12 @@ def run_in_new_thread():
                         os.system('say "Making sell order now"')
 
                     if one_sell_price:
-                        sell_quantity = float(get_sell_quantity()['sell_quantity'])
-                        sell_order_id = sell_order_id_prefix + str(order_id_iterator)
-                        sell_order_1 = create_limit_sell_order(sell_order_id, user_sell_price1, sell_quantity)
+                        sell_quantity = float(
+                            get_sell_quantity()['sell_quantity'])
+                        sell_order_id = sell_order_id_prefix + \
+                            str(order_id_iterator)
+                        sell_order_1 = create_limit_sell_order(
+                            sell_order_id, user_sell_price1, sell_quantity)
                         time.sleep(4)
                     # TODO: add logic for multiple sell quantities
 
@@ -378,7 +434,8 @@ def run_in_new_thread():
             elif order_cancelled(buy_order):
                 print('Buy order has been cancelled. Exiting')
                 if speak:
-                    os.system('say "Buy order has been cancelled. Check connection. Exiting."')
+                    os.system(
+                        'say "Buy order has been cancelled. Check connection. Exiting."')
                 stop()
 
             if order_filled(sell_order_1):
@@ -401,7 +458,8 @@ def run_in_new_thread():
                 print('Stop limit order has been filled. Exiting.')
                 # this is a Mac/Linux feature only
                 if speak:
-                    os.system('say "Stop limit order has been filled. Exiting."')
+                    os.system(
+                        'say "Stop limit order has been filled. Exiting."')
                 print('Cancelling sell order.')
                 client.cancel_session_orders()
                 stop()
@@ -410,7 +468,8 @@ def run_in_new_thread():
                 print('Stop limit order has been cancelled. Exiting')
                 # this is a Mac/Linux feature only
                 if speak:
-                    os.system('say "Stop limit order has been cancelled. Exiting."')
+                    os.system(
+                        'say "Stop limit order has been cancelled. Exiting."')
                 stop()
 
             time.sleep(3)
@@ -436,19 +495,21 @@ def stop():
     sys.exit()
 
 
-def open_websocket_connections():
-    global marketdata_websocket_thread
-    global activeorder_websocket_thread
+# def open_websocket_connections():
+#     global marketdata_websocket_thread
+#     global activeorder_websocket_thread
 
-    marketdata_websocket_thread = threading.Thread(target=websocketclient.open_marketdata_websocket)
-    marketdata_websocket_thread.daemon = True
-    marketdata_websocket_thread.name = 'marketdata_websocket_thread'
-    marketdata_websocket_thread.start()
+#     marketdata_websocket_thread = threading.Thread(
+#         target=websocketclient.open_marketdata_websocket)
+#     marketdata_websocket_thread.daemon = True
+#     marketdata_websocket_thread.name = 'marketdata_websocket_thread'
+#     marketdata_websocket_thread.start()
 
-    activeorder_websocket_thread = threading.Thread(target=websocketclient.open_active_order_websocket)
-    activeorder_websocket_thread.daemon = True
-    activeorder_websocket_thread.name = 'activeorder_websocket_thread'
-    activeorder_websocket_thread.start()
+#     activeorder_websocket_thread = threading.Thread(
+#         target=websocketclient.open_active_order_websocket)
+#     activeorder_websocket_thread.daemon = True
+#     activeorder_websocket_thread.name = 'activeorder_websocket_thread'
+#     activeorder_websocket_thread.start()
 
 
 # open_websocket_connections()
